@@ -1,0 +1,151 @@
+---
+swagger: "2.0"
+info:
+  version: "0.0.0"
+  title: "E-Paper API"
+paths:
+  /login:
+    post:
+      description: "Login using username and password. Should return authentication\
+        \ token which used as part of \n"
+      operationId: "loginPOST"
+      parameters:
+      - name: "username"
+        in: "formData"
+        description: "Username"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "formData"
+        description: "Password"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful response"
+          schema:
+            type: "string"
+            title: "token"
+        401:
+          description: "Failed to login"
+      x-swagger-router-controller: "Default"
+  /news/breaking:
+    get:
+      description: "Gets breaking `News` objects. This should always return today's\
+        \ breaking news only\n"
+      operationId: "newsBreakingGET"
+      parameters: []
+      responses:
+        200:
+          description: "Successful response"
+          schema:
+            type: "array"
+            title: "ArrayOfNews"
+            items:
+              $ref: "#/definitions/News"
+      x-swagger-router-controller: "Default"
+  /news/categories:
+    get:
+      description: "Gets today News `Category` objects. Category will contain start\
+        \ and end page no. This is to help client render the correct link for each\
+        \ category. \n"
+      operationId: "newsCategoriesGET"
+      parameters: []
+      responses:
+        200:
+          description: "Successful response"
+          schema:
+            $ref: "#/definitions/Categories"
+      x-swagger-router-controller: "Default"
+  /news/today/{category}/{pageNo}news.pdf:
+    get:
+      description: "Gets today News thumbnail.png. This should return pdf content\
+        \ and not json. Added here just for documentation purpose.\n"
+      operationId: "newsTodayCategoryPageNonews_pdfGET"
+      parameters:
+      - name: "pageNo"
+        in: "path"
+        description: "Page No"
+        required: true
+        type: "number"
+        format: "integer"
+      - name: "auth"
+        in: "header"
+        description: "Authentication token - Use to identify user and limit the usage."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "path"
+        description: "category"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful response"
+        403:
+          description: "Hit the download limit"
+      x-swagger-router-controller: "Default"
+  /news/today/{category}/{pageNo}thumbnail.png:
+    get:
+      description: "Gets today News thumbnail.png. This should return png image content\
+        \ and not json. Added here just for documentation purpose. \n"
+      operationId: "newsTodayCategoryPageNothumbnail_pngGET"
+      parameters:
+      - name: "pageNo"
+        in: "path"
+        description: "Page No"
+        required: true
+        type: "number"
+        format: "integer"
+      - name: "category"
+        in: "path"
+        description: "category"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful response"
+      x-swagger-router-controller: "Default"
+definitions:
+  Category:
+    properties:
+      title:
+        type: "string"
+        description: "Title of the category"
+      total:
+        type: "integer"
+      news:
+        type: "array"
+        items:
+          $ref: "#/definitions/News_1"
+  News_1:
+    properties:
+      imageURL:
+        type: "string"
+      pdfURL:
+        type: "string"
+      pageNo:
+        type: "string"
+  Categories:
+    properties:
+      total:
+        type: "integer"
+      date:
+        type: "string"
+        format: "date"
+      categories:
+        type: "array"
+        items:
+          $ref: "#/definitions/Category"
+  News:
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"
+      thumbnailURL:
+        type: "string"
+      pdfURL:
+        type: "string"
+      pageNo:
+        type: "string"
